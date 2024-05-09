@@ -3,7 +3,7 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
+//DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -50,13 +50,40 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        //todo
+        let mut current = &mut self.root;
+        loop {
+            match current {
+                Some(ref mut node) => {
+                    match value.cmp(&node.value) {
+                        Ordering::Less => current = &mut node.left,
+                        Ordering::Greater => current = &mut node.right,
+                        Ordering::Equal => break,
+                    }
+                },
+                None => {
+                    *current = Some(Box::new(TreeNode::new(value)));
+                    break;
+                },
+            }
+        }
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        let mut current = &self.root;
+        loop {
+            match current {
+                Some(ref node) => {
+                    match value.cmp(&node.value) {
+                        Ordering::Less => current = &node.left,
+                        Ordering::Greater => current = &node.right,
+                        Ordering::Equal => return true,
+                    }
+                },
+                None => return false,
+            }
+        }
     }
 }
 
@@ -66,7 +93,21 @@ where
 {
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
-        //TODO
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                match self.left {
+                    Some(ref mut node) => node.insert(value),
+                    None => self.left = Some(Box::new(TreeNode::new(value))),
+                }
+            },
+            Ordering::Greater => {
+                match self.right {
+                    Some(ref mut node) => node.insert(value),
+                    None => self.right = Some(Box::new(TreeNode::new(value))),
+                }
+            },
+            Ordering::Equal => (),
+        }
     }
 }
 

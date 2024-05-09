@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+// DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +37,17 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // if self.items.len() > self.count + 1 {
+        //     self.items.truncate(self.count + 1);
+        // }
+        self.count += 1;
+        self.items.push(value);
+        let mut swap_idx = self.count;
+        while swap_idx > 1 && (self.comparator)(&self.items[swap_idx], &self.items[self.parent_idx(swap_idx)]) {
+            let mut parent_idx = self.parent_idx(swap_idx);
+            self.items.swap(swap_idx, parent_idx);
+            swap_idx = self.parent_idx(swap_idx);
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,9 +67,25 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        if right_idx > self.count {
+            left_idx
+        } else if (self.comparator)(&self.items[left_idx], &self.items[right_idx]) {
+            left_idx
+        } else {
+            right_idx
+        }
     }
+
+    // pub fn print_items(&self)
+    // where
+    //     T: std::fmt::Display,
+    // {
+    //     for i in 1..=self.count {
+    //         println!("{}", self.items[i]);
+    //     }
+    // }
 }
 
 impl<T> Heap<T>
@@ -79,13 +105,28 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default+Copy,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+        self.items.swap(1, self.count);
+        let root = self.items.pop();
+        self.count -= 1;
+        let mut idx = 1;
+        while self.children_present(idx) {
+            let smallest_child_idx = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[smallest_child_idx], &self.items[idx]) {
+                self.items.swap(smallest_child_idx, idx);
+                idx = smallest_child_idx;
+            } else {
+                break;
+            }
+        }
+        root
     }
 }
 
